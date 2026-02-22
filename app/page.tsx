@@ -37,12 +37,15 @@ export default function MissionControl() {
   const [activeTab, setActiveTab] = useState("overview")
   const [currentTime, setCurrentTime] = useState(new Date())
   const [authenticated, setAuthenticated] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    // Check auth
-    setAuthenticated(isLoggedIn())
+    console.log("MissionControl mounted")
+    setMounted(true)
+    const auth = isLoggedIn()
+    console.log("Auth status:", auth)
+    setAuthenticated(auth)
     
-    // Update time every second
     const interval = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
@@ -51,6 +54,7 @@ export default function MissionControl() {
   }, [])
 
   const handleLogin = () => {
+    console.log("Login handler called")
     setAuthenticated(true)
   }
 
@@ -59,7 +63,17 @@ export default function MissionControl() {
     setAuthenticated(false)
   }
 
+  // Prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="text-zinc-400">Initializing...</div>
+      </div>
+    )
+  }
+
   if (!authenticated) {
+    console.log("Showing login screen")
     return <LoginScreen onLogin={handleLogin} />
   }
 

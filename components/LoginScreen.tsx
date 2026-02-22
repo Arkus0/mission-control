@@ -20,12 +20,15 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    console.log("Form submitted", { username, password })
     setError("")
     setIsLoading(true)
 
     // Small delay to prevent brute force
     setTimeout(() => {
-      if (login(username, password)) {
+      const result = login(username, password)
+      console.log("Login result:", result)
+      if (result) {
         onLogin()
       } else {
         setError("Invalid credentials")
