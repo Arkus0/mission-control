@@ -15,7 +15,7 @@ import { TaskBoard } from "@/components/tools/TaskBoard"
 import { SEOAnalyzer } from "@/components/tools/SEOAnalyzer"
 import { LoginScreen } from "@/components/LoginScreen"
 import { ApiConfig } from "@/components/tools/ApiConfig"
-import { isLoggedIn, logout, setApiKeys } from "@/lib/config"
+import { isLoggedIn, logout } from "@/lib/config"
 import { 
   Terminal, 
   FileText, 
@@ -37,11 +37,9 @@ export default function MissionControl() {
   const [activeTab, setActiveTab] = useState("overview")
   const [currentTime, setCurrentTime] = useState(new Date())
   const [authenticated, setAuthenticated] = useState(false)
-  const [mounted, setMounted] = useState(false)
 
-  // Check auth on mount
   useEffect(() => {
-    setMounted(true)
+    // Check auth
     setAuthenticated(isLoggedIn())
     
     // Update time every second
@@ -59,15 +57,6 @@ export default function MissionControl() {
   const handleLogout = () => {
     logout()
     setAuthenticated(false)
-  }
-
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <div className="text-zinc-400">Loading...</div>
-      </div>
-    )
   }
 
   if (!authenticated) {
