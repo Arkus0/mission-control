@@ -14,6 +14,7 @@ import { ContentCalendar } from "@/components/tools/ContentCalendar"
 import { TaskBoard } from "@/components/tools/TaskBoard"
 import { SEOAnalyzer } from "@/components/tools/SEOAnalyzer"
 import { LoginScreen } from "@/components/LoginScreen"
+import { ApiConfig } from "@/components/tools/ApiConfig"
 import { isLoggedIn, logout, setApiKeys } from "@/lib/config"
 import { 
   Terminal, 
@@ -31,24 +32,24 @@ import {
   Settings,
   LogOut
 } from "lucide-react"
-import { ApiConfig } from "@/components/tools/ApiConfig"
 
 export default function MissionControl() {
   const [activeTab, setActiveTab] = useState("overview")
-  const [currentTime] = useState(new Date())
+  const [currentTime, setCurrentTime] = useState(new Date())
   const [authenticated, setAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
 
   // Check auth on mount
   useEffect(() => {
+    setMounted(true)
     setAuthenticated(isLoggedIn())
-    setIsLoading(false)
     
-    // Inject API keys from window.__CONFIG__ if available
-    const win = window as any
-    if (win.__CONFIG__?.OPENROUTER_API_KEY && win.__CONFIG__?.GITHUB_TOKEN) {
-      setApiKeys(win.__CONFIG__.OPENROUTER_API_KEY, win.__CONFIG__.GITHUB_TOKEN)
-    }
+    // Update time every second
+    const interval = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+    
+    return () => clearInterval(interval)
   }, [])
 
   const handleLogin = () => {
@@ -60,7 +61,8 @@ export default function MissionControl() {
     setAuthenticated(false)
   }
 
-  if (isLoading) {
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
         <div className="text-zinc-400">Loading...</div>
@@ -141,7 +143,6 @@ export default function MissionControl() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      {}
       <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -176,7 +177,6 @@ export default function MissionControl() {
         </div>
       </header>
 
-      {}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-zinc-900 border border-zinc-800 p-1 flex-wrap h-auto gap-1">
@@ -196,7 +196,6 @@ export default function MissionControl() {
             </TabsTrigger>
           </TabsList>
 
-          {}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tools.map(tool => (
@@ -257,7 +256,6 @@ export default function MissionControl() {
             </Card>
           </TabsContent>
 
-          {}
           {tools.map(tool => (
             <TabsContent key={tool.id} value={tool.id}>
               <div className="mb-6">
